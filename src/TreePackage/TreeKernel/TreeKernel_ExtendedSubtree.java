@@ -105,8 +105,8 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
         //result
         double similarityScore=0;
         //tree depth measure
-        double controlDepth=Collections.max(controlNodeLevel);
-        double testDepth=Collections.max(testNodeLevel);
+        /*double*/ int controlDepth=Collections.max(controlNodeLevel);
+        /*double*/ int testDepth=Collections.max(testNodeLevel);
         
         //apply alfa and beta
         for(int c=0;c<controlNodeList.size();c++){
