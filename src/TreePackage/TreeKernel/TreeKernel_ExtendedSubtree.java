@@ -4,6 +4,10 @@ package TreePackage.TreeKernel;
 
 import MachineLearning.Kernel.AbstractKernelM;
 import TreePackage.TreeTraversal;
+import TreePackage.ParserPackage.XMLParser_Java;
+
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -223,6 +227,7 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
         Mapping[][] mappingMatrix=new Mapping[controlNodeList.size()][testNodeList.size()];
         
         //scan all nodes        
+        long t0 = System.currentTimeMillis();
         for(int c=0;c<controlNodeList.size();c++){            
             for(int t=0;t<testNodeList.size();t++){
                 if(nodeCompare.CompareStructure(controlNodeList.get(c), testNodeList.get(t))!=0){
@@ -237,6 +242,8 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
                     mappingMatrix[c][t]=null;
                 }
             }
+            System.out.println(String.format("Comparing: %d/%d VS %d: %ds", c, controlNodeList.size(),
+                    testNodeList.size(), (System.currentTimeMillis() - t0) / 1000));
         }
 
         return mappingMatrix;
@@ -328,5 +335,94 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
             
             
 
-}
+    /**
+     * Traverse a tree in post-order and save all nodes to an array
+     * @param root      {@code Node} the root of the tree
+     * @param results   {@code ArrayList<Node>} the result array
+     */
+    private static void traverseSubtree(Node root, ArrayList<Node> results) {
+        assert root != null;
+        if (root.getNodeType() != Node.ELEMENT_NODE)
+            return ;
+        Node child = root.getFirstChild();
+        if (child != null)
+            traverseSubtree(child, results);
+        while ((child = child.getNextSibling()) != null)
+            traverseSubtree(child, results);
+        results.add(root);
+    } // private static void traverseSubtree(Node root, ArrayList<Node> results)
 
+    /**
+     * Run the test on all test cases
+     * @param treeType      {@code String} type of the tree
+     * @throws Exception    any possible exception
+     */
+    public static void runTest(String treeType) throws Exception {
+        String logFile = "databases/EST-" + treeType + ".txt";
+        FileWriter output = new FileWriter(new File(logFile));
+        output.close();
+
+        for (int i = 0; i < 1; i++) {
+            File folder = new File(String.format("databases/Subset%02d/", i+1));
+            System.out.println(String.format("databases/Subset%02d/", i+1));
+
+            // Pares each XML file
+            System.out.print("  Parsing Files: ");
+            File[] files = folder.listFiles();
+            int idx = 0;
+            ArrayList<ArrayList<Node>> trees = new ArrayList<ArrayList<Node>>();
+            ArrayList<String> fileNames = new ArrayList<String>();
+            for (File f: files) {
+                if (!f.getName().contains(treeType))
+                    continue ;
+                fileNames.add(f.toString());
+                ArrayList<Node> treeNodes = new ArrayList<Node>();
+                Node root = new XMLParser_Java().parse(f.toString()).getDocumentElement();
+                traverseSubtree(root, treeNodes);
+                trees.add(treeNodes);
+                System.out.print(((idx++) / 10 + 1) + "");
+            } // for (File f: files)
+            System.out.println();
+
+            // Cross compare each pair of documents
+            idx = 0;
+            for (int j = 0; j < trees.size(); j++) {
+                for (int k = j+1; k < trees.size(); k++) {
+                    long t1 = System.currentTimeMillis();
+                    ArrayList<Node> tree1 = trees.get(j), tree2 = trees.get(k);
+                    Node root1 = tree1.get(tree1.size() - 1), root2 = tree2.get(tree2.size() - 1);
+                    TreeKernel_ExtendedSubtree kernal = new TreeKernel_ExtendedSubtree();
+                    kernal.controlNodeList = new ArrayList<Node>();
+                    for (int m = 0; m < tree1.size(); m ++)
+                        kernal.controlNodeList.add(tree1.get(m));
+                    kernal.testNodeList = new ArrayList<Node>();
+                    for (int m = 0; m < tree2.size(); m ++)
+                        kernal.testNodeList.add(tree2.get(m));
+                    double est = kernal.getSimilarityNormalized(root1, root2);
+                    long t2 = System.currentTimeMillis();
+                    String log = String.format("  Group: %2d, %4d/1176: %s, %s, EST=%.4f, time=%ds",
+                                               i+1, ++idx, fileNames.get(j), fileNames.get(k), est, (t2 - t1) / 1000);
+                    System.out.println(log);
+                    output = new FileWriter(new File(logFile), true);
+                    output.write(log + "\n");
+                    output.close();
+                } // for (int k = j+1; k < trees.size(); k++)
+            } // for (int j = 0; j < trees.size(); j++)
+
+            
+        } // for (int i = 0; i < 10; i++)
+        
+    } // public static void runTest(String treeType) throws Exception
+
+    /**
+     * Main entry: run the test cases
+     * @param args          {@code String[]} command line arguments
+     * @throws Exception    any possible exception
+     */
+    public static void main(String[] args) throws Exception {
+        runTest("BT");
+//        runTest("DT");
+//        runTest("LT");
+    } // public static void main(String[] args)
+
+}
