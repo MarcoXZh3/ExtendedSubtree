@@ -6,11 +6,21 @@ import MachineLearning.Kernel.AbstractKernelM;
 import TreePackage.TreeTraversal;
 import TreePackage.ParserPackage.XMLParser_Java;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.tukaani.xz.LZMA2Options;
+import org.tukaani.xz.XZOutputStream;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -242,8 +252,9 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
                     mappingMatrix[c][t]=null;
                 }
             }
-            System.out.println(String.format("Comparing: %d/%d VS %d: %ds", c, controlNodeList.size(),
-                    testNodeList.size(), (System.currentTimeMillis() - t0) / 1000));
+//            if (c % 100 == 0)
+                System.out.println(String.format("Comparing: %d/%d VS %d: %ds", c, controlNodeList.size(),
+                                                 testNodeList.size(), (System.currentTimeMillis() - t0) / 1000));
         }
 
         return mappingMatrix;
@@ -408,11 +419,61 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
                     output.close();
                 } // for (int k = j+1; k < trees.size(); k++)
             } // for (int j = 0; j < trees.size(); j++)
-
-            
         } // for (int i = 0; i < 10; i++)
-        
     } // public static void runTest(String treeType) throws Exception
+
+    /**
+     * Update a sub DOM tree of the XML
+     * @param node      {@code Node} root node of the sub tree
+     * @param attr      {@code String} the attribute to be compressed
+     */
+    private static void updateXMLNode(Node node, String attr) {
+        if (node.getNodeType() != Node.ELEMENT_NODE)
+            return ;
+        String value = ((Element) node).getAttribute(attr);
+        assert value != null && value.length() > 0;
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        try {
+            XZOutputStream outxz = new XZOutputStream(output, new LZMA2Options());
+            outxz.write(value.getBytes());
+            outxz.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } // try - catch (Exception e)
+        ((Element) node).setAttribute("clength", output.toByteArray().length + "");
+
+        Node child = node.getFirstChild();
+        if (child != null)
+            updateXMLNode(child, attr);
+        while ((child = child.getNextSibling()) != null)
+            updateXMLNode(child, attr);
+    } // private static void updateXMLNode(Node node, String attr)
+
+    /**
+     * Add a new attribute "{@code clength}" to each XML element
+     */
+    public static void addAttrToXMLs() {
+        for (int i = 0; i < 10; i++) {
+            File folder = new File(String.format("databases/Subset%02d/", i+1));
+            System.out.println(String.format("databases/Subset%02d/", i+1));
+
+            File[] files = folder.listFiles();
+            for (int j = 0; j < files.length; j++) {
+                File f = files[j];
+                Document doc = new XMLParser_Java().parse(f.toString());
+                updateXMLNode(doc.getDocumentElement(), f.getName().contains("DT") ? "name" : "info");
+                try {
+                    Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                    Result output = new StreamResult(new File(f.toString()));
+                    Source input = new DOMSource(doc);
+                    transformer.transform(input, output);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } // try - catch (Exception e)
+                System.out.println(String.format("  Group %d - %d/%d: %s", i+1, j+1, files.length, f.getName()));
+            } // for (int j = 0; j < files.length; j++)
+        } // for (int i = 0; i < 10; i++)
+    } // public static void addAttrToXMLs()
 
     /**
      * Main entry: run the test cases
@@ -420,6 +481,8 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
      * @throws Exception    any possible exception
      */
     public static void main(String[] args) throws Exception {
+//        addAttrToXMLs();
+
         runTest("BT");
 //        runTest("DT");
 //        runTest("LT");

@@ -94,22 +94,18 @@ public class NodeCompare{
             return value1.equalsIgnoreCase(value2) ? 1 : 0;
         } // if (value1.length() == 0 || value2.length() == 0)
         try {
-            ByteArrayOutputStream output1 = new ByteArrayOutputStream();
-            ByteArrayOutputStream output2 = new ByteArrayOutputStream();
-            ByteArrayOutputStream output3 = new ByteArrayOutputStream();
-            XZOutputStream outxz1 = new XZOutputStream(output1, new LZMA2Options());
-            outxz1.write(value1.getBytes());
-            outxz1.close();
-            XZOutputStream outxz2 = new XZOutputStream(output2, new LZMA2Options());
-            outxz2.write(value2.getBytes());
-            outxz2.close();
-            XZOutputStream outxz3 = new XZOutputStream(output3, new LZMA2Options());
-            outxz3.write((value1 + value2).getBytes());
-            outxz3.close();
-            byte[] bs1 = output1.toByteArray(), bs2 = output2.toByteArray(), bs3 = output3.toByteArray();
-            long min = bs1.length > bs2.length ? bs2.length : bs1.length;
-            long max = bs1.length < bs2.length ? bs2.length : bs1.length;
-            return 1.0 * (bs3.length - min) / max < 0.25 ? 1 : 0;
+            long min = Long.parseLong(((Element)controlNode).getAttribute("clength"));
+            long max = Long.parseLong(((Element)testNode).getAttribute("clength"));
+            if (min > max) {
+                long tmp = min;
+                min = max;
+                max = tmp;
+            } // if (min > max)
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            XZOutputStream outxz = new XZOutputStream(output, new LZMA2Options());
+            outxz.write((value1 + value2).getBytes());
+            outxz.close();
+            return 1.0 * (output.toByteArray().length - min) / max < 0.25 ? 1 : 0;
         } catch (Exception e) {
             return 0;
         } // try - catch (Exception e)
