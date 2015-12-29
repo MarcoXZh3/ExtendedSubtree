@@ -362,7 +362,7 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
         FileWriter output = new FileWriter(new File(logFile));
         output.close();
 
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 10; i++) {
             File folder = new File(String.format("databases/Subset%02d/", i+1));
             System.out.println(String.format("databases/Subset%02d/", i+1));
 
