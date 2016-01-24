@@ -17,8 +17,6 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.tukaani.xz.LZMA2Options;
-import org.tukaani.xz.XZOutputStream;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -253,8 +251,8 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
                 }
             }
 //            if (c % 100 == 0)
-                System.out.println(String.format("Comparing: %d/%d VS %d: %ds", c, controlNodeList.size(),
-                                                 testNodeList.size(), (System.currentTimeMillis() - t0) / 1000));
+//                System.out.println(String.format("Comparing: %d/%d VS %d: %ds", c, controlNodeList.size(),
+//                                                 testNodeList.size(), (System.currentTimeMillis() - t0) / 1000));
         }
 
         return mappingMatrix;
@@ -350,18 +348,22 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
      * Traverse a tree in post-order and save all nodes to an array
      * @param root      {@code Node} the root of the tree
      * @param results   {@code ArrayList<Node>} the result array
+     * @return          {@code int} the size of the sub tree
      */
-    private static void traverseSubtree(Node root, ArrayList<Node> results) {
-        assert root != null;
-        if (root.getNodeType() != Node.ELEMENT_NODE)
-            return ;
+    private static int postOrderTraverseSubtree(Node root, ArrayList<Node> results) {
+        assert root != null && root.getNodeType() == Node.ELEMENT_NODE;
+        int size = 0;
         Node child = root.getFirstChild();
-        if (child != null)
-            traverseSubtree(child, results);
-        while ((child = child.getNextSibling()) != null)
-            traverseSubtree(child, results);
+        while (true) {
+            if (child == null)
+                break ;
+            if (child.getNodeType() == Node.ELEMENT_NODE)
+                size += postOrderTraverseSubtree(child, results);
+            child = child.getNextSibling();
+        } // while (true)
         results.add(root);
-    } // private static void traverseSubtree(Node root, ArrayList<Node> results)
+        return size + 1;
+    } // private static int postOrderTraverseSubtree(Node root, ArrayList<Node> results)
 
     /**
      * Run the test on all test cases
@@ -369,8 +371,11 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
      * @throws Exception    any possible exception
      */
     public static void runTest(String treeType) throws Exception {
-        String logFile = "databases/EST-" + treeType + ".txt";
-        FileWriter output = new FileWriter(new File(logFile));
+        String logFile1 = "databases/EST-" + treeType + ".txt";
+        FileWriter output = new FileWriter(new File(logFile1));
+        output.close();
+        String logFile2 = "databases/TreeSize-" + treeType + ".txt";
+        output = new FileWriter(new File(logFile2));
         output.close();
 
         for (int i = 0; i < 10; i++) {
@@ -389,9 +394,12 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
                 fileNames.add(f.toString());
                 ArrayList<Node> treeNodes = new ArrayList<Node>();
                 Node root = new XMLParser_Java().parse(f.toString()).getDocumentElement();
-                traverseSubtree(root, treeNodes);
+                int treeSize = postOrderTraverseSubtree(root, treeNodes);
                 trees.add(treeNodes);
                 System.out.print(((idx++) / 10 + 1) + "");
+                output = new FileWriter(new File(logFile2), true);
+                output.write(String.format("%s\t%5d\n", f.toString(), treeSize));
+                output.close();
             } // for (File f: files)
             System.out.println();
 
@@ -411,10 +419,10 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
                         kernal.testNodeList.add(tree2.get(m));
                     double est = kernal.getSimilarityNormalized(root1, root2);
                     long t2 = System.currentTimeMillis();
-                    String log = String.format("  Group: %2d, %4d/1176: %s, %s, EST=%.4f, time=%ds",
-                                               i+1, ++idx, fileNames.get(j), fileNames.get(k), est, (t2 - t1) / 1000);
+                    String log = String.format("  Group: %2d, %4d/1250: %s, %s, EST=%.4f, time=%dms",
+                                               i+1, ++idx, fileNames.get(j), fileNames.get(k), est, (t2 - t1));
                     System.out.println(log);
-                    output = new FileWriter(new File(logFile), true);
+                    output = new FileWriter(new File(logFile1), true);
                     output.write(log + "\n");
                     output.close();
                 } // for (int k = j+1; k < trees.size(); k++)
@@ -427,6 +435,7 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
      * @param node      {@code Node} root node of the sub tree
      * @param attr      {@code String} the attribute to be compressed
      */
+    /*
     private static void updateXMLNode(Node node, String attr) {
         if (node.getNodeType() != Node.ELEMENT_NODE)
             return ;
@@ -448,10 +457,12 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
         while ((child = child.getNextSibling()) != null)
             updateXMLNode(child, attr);
     } // private static void updateXMLNode(Node node, String attr)
+    */
 
     /**
      * Add a new attribute "{@code clength}" to each XML element
      */
+    /*
     public static void addAttrToXMLs() {
         for (int i = 0; i < 10; i++) {
             File folder = new File(String.format("databases/Subset%02d/", i+1));
@@ -474,6 +485,7 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
             } // for (int j = 0; j < files.length; j++)
         } // for (int i = 0; i < 10; i++)
     } // public static void addAttrToXMLs()
+    */
 
     /**
      * Main entry: run the test cases
@@ -484,8 +496,8 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
 //        addAttrToXMLs();
 
         runTest("BT");
-//        runTest("DT");
-//        runTest("LT");
+        runTest("VT");
+        runTest("DT");
     } // public static void main(String[] args)
 
 }

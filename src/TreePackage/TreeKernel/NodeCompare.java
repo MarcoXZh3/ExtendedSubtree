@@ -3,9 +3,11 @@ package TreePackage.TreeKernel;
 
 import java.io.ByteArrayOutputStream;
 
-import org.tukaani.xz.LZMA2Options;
-import org.tukaani.xz.XZOutputStream;
 import org.w3c.dom.*;
+
+import ca.eandb.jmist.framework.color.CIELab;
+import ca.eandb.jmist.framework.color.CIEXYZ;
+import ca.eandb.jmist.framework.color.RGB;
 //-----------------------------------------------------------------------------------
 // NodeCompare
 //-----------------------------------------------------------------------------------
@@ -63,6 +65,43 @@ public class NodeCompare{
         return result;
     }
 
+    /**
+     */
+    private String[] css = {
+        // Position
+        "css_position",
+        // Background
+        "css_background-color",           "css_background-image",
+        // Border
+        "css_border-bottom-color",        "css_border-bottom-style",         "css_border-bottom-width",
+        "css_border-left-color",          "css_border-left-style",           "css_border-left-width",
+        "css_border-right-color",         "css_border-right-style",          "css_border-right-width",
+        "css_border-top-color",           "css_border-top-style",            "css_border-top-width",
+        "css_outline-color",              "css_outline-style",               "css_outline-width",
+        "css_border-bottom-left-radius",  "css_border-bottom-right-radius",
+        "css_border-top-left-radius",     "css_border-top-right-radius",     "css_box-shadow",
+        // Text - paragraph
+        "css_direction",                  "css_letter-spacing",              "css_line-height",
+        "css_text-align",                 "css_text-decoration",             "css_text-indent",
+        "css_text-transform",             "css_vertical-align",              "css_white-space",
+        "css_word-spacing",               "css_text-overflow",               "css_text-shadow",
+        "css_word-break",                 "css_word-wrap",
+        // Text - column
+        /*"css_column-count",             "css_-webkit-column-count",*/      "css_-moz-column-count",
+        /*"css_column-gap",               "css_-webkit-column-gap",*/        "css_-moz-column-gap",
+        /*"css_column-rule-color",        "css_-webkit-column-rule-color",*/ "css_-moz-column-rule-color",
+        /*"css_column-rule-style",        "css_-webkit-column-rule-style",*/ "css_-moz-column-rule-style",
+        /*"css_column-rule-width",        "css_-webkit-column-rule-width",*/ "css_-moz-column-rule-width",
+        /*"css_column-width",             "css_-webkit-column-width",*/      "css_-moz-column-width",
+        // Text - list
+        "css_list-style-image",           "css_list-style-position",         "css_list-style-type",
+        // Text - font
+        "css_font-family",                "css_font-size",                   "css_font-weight",
+        "css_font-size-adjust",// Only Firefox supports this property
+        "css_font-style",                 "css_font-variant",                "css_color"
+    }; // private String[] css = { ... };
+
+
     public int CompareStructure(Node controlNode, Node testNode){
         /*
         int result;
@@ -84,6 +123,28 @@ public class NodeCompare{
         if (controlNode.getNodeType() != Node.ELEMENT_NODE || testNode.getNodeType() != Node.ELEMENT_NODE)
             return 0;
 
+        double sum = 0.0;
+        for (String css : this.css) {
+            String value1 = ((Element)controlNode).getAttribute(css);
+            String value2 = ((Element)testNode).getAttribute(css);
+            if (css.contains("color") &&
+                !value1.equalsIgnoreCase("transparent") && !value2.equalsIgnoreCase("transparent")) {
+                System.out.println(value1 + ";" + value2); 
+                String[] rgb1 = value1.substring(4, value1.length()-1).split(", ");
+                String[] rgb2 = value2.substring(4, value2.length()-1).split(", ");
+                CIELab lab1 = CIELab.fromXYZ(new RGB(Double.parseDouble(rgb1[0])/255.0,
+                        Double.parseDouble(rgb1[1])/255.0,
+                        Double.parseDouble(rgb1[2])/255.0).toXYZ(), CIEXYZ.D65);
+                CIELab lab2 = CIELab.fromXYZ(new RGB(Double.parseDouble(rgb2[0])/255.0,
+                                                     Double.parseDouble(rgb2[1])/255.0,
+                                                     Double.parseDouble(rgb2[2])/255.0).toXYZ(), CIEXYZ.D65);
+                sum += CIELab.deltaE(lab1, lab2) < 5.0 ? 1.0 : 0.0;
+            } else {
+                sum += value1.equalsIgnoreCase(value2) ? 1.0 : 0.0;
+            } // else - if (css.contains("color") && ... )
+        } // for (String css : this.css)
+        return (sum / this.css.length) > 0.8 ? 1 : 0;
+        /* This was used to compare nodes by base64 strings of the screenshots
         //assert controlNode.getNodeType() == Node.ELEMENT_NODE && testNode.getNodeType() == Node.ELEMENT_NODE;
         String value1 = ((Element)controlNode).getAttribute("info");
         String value2 = ((Element)testNode).getAttribute("info");
@@ -109,6 +170,7 @@ public class NodeCompare{
         } catch (Exception e) {
             return 0;
         } // try - catch (Exception e)
+        */
     }
 
     private int StringCompare(String str1, String str2){
