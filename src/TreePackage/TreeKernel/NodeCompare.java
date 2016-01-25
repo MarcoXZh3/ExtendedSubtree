@@ -129,7 +129,6 @@ public class NodeCompare{
             String value2 = ((Element)testNode).getAttribute(css);
             if (css.contains("color") &&
                 !value1.equalsIgnoreCase("transparent") && !value2.equalsIgnoreCase("transparent")) {
-                System.out.println(value1 + ";" + value2); 
                 String[] rgb1 = value1.substring(4, value1.length()-1).split(", ");
                 String[] rgb2 = value2.substring(4, value2.length()-1).split(", ");
                 CIELab lab1 = CIELab.fromXYZ(new RGB(Double.parseDouble(rgb1[0])/255.0,
