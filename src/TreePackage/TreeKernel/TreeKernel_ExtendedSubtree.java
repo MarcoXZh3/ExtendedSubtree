@@ -405,6 +405,7 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
             System.out.println();
 
             // Cross compare each pair of documents
+            int total = trees.size() * (trees.size() - 1) / 2;
             idx = 0;
             for (int j = 0; j < trees.size(); j++) {
                 for (int k = j+1; k < trees.size(); k++) {
@@ -420,8 +421,8 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
                         kernal.testNodeList.add(tree2.get(m));
                     double est = kernal.getSimilarityNormalized(root1, root2);
                     long t2 = System.currentTimeMillis();
-                    String log = String.format("  Group: %2d, %4d/1250: %s, %s, EST=%.4f, time=%dms",
-                                               i+1, ++idx, fileNames.get(j), fileNames.get(k), est, (t2 - t1));
+                    String log = String.format("  Group: %2d, %4d/%d: %s, %s, EST=%.4f, time=%dms",
+                                               i+1, ++idx, total, fileNames.get(j), fileNames.get(k), est, (t2 - t1));
                     System.out.println(log);
                     output = new FileWriter(new File(logFile1), true);
                     output.write(log + "\n");
@@ -496,9 +497,9 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
     public static void main(String[] args) throws Exception {
 //        addAttrToXMLs();
 
-        runTest("BT", 30);
-        runTest("VT", 30);
-        runTest("DT", 30);
+        runTest("BT", 15);
+        runTest("VT", 15);
+        runTest("DT", 15);
     } // public static void main(String[] args)
 
 }
