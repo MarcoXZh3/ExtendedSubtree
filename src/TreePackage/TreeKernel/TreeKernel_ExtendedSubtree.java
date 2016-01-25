@@ -368,9 +368,10 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
     /**
      * Run the test on all test cases
      * @param treeType      {@code String} type of the tree
+     * @param groups        {@code int} number of groups to run
      * @throws Exception    any possible exception
      */
-    public static void runTest(String treeType) throws Exception {
+    public static void runTest(String treeType, int groups) throws Exception {
         String logFile1 = "databases/EST-" + treeType + ".txt";
         FileWriter output = new FileWriter(new File(logFile1));
         output.close();
@@ -378,7 +379,7 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
         output = new FileWriter(new File(logFile2));
         output.close();
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < groups; i++) {
             File folder = new File(String.format("databases/Subset%02d/", i+1));
             System.out.println(String.format("databases/Subset%02d/", i+1));
 
@@ -427,8 +428,8 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
                     output.close();
                 } // for (int k = j+1; k < trees.size(); k++)
             } // for (int j = 0; j < trees.size(); j++)
-        } // for (int i = 0; i < 10; i++)
-    } // public static void runTest(String treeType) throws Exception
+        } // for (int i = 0; i < groups; i++)
+    } // public static void runTest(String treeType, int groups) throws Exception
 
     /**
      * Update a sub DOM tree of the XML
@@ -495,9 +496,9 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
     public static void main(String[] args) throws Exception {
 //        addAttrToXMLs();
 
-        runTest("BT");
-        runTest("VT");
-        runTest("DT");
+        runTest("BT", 30);
+        runTest("VT", 30);
+        runTest("DT", 30);
     } // public static void main(String[] args)
 
 }
