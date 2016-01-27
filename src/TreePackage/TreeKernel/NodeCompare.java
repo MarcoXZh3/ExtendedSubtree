@@ -129,8 +129,8 @@ public class NodeCompare{
             String value2 = ((Element)testNode).getAttribute(css);
             if (css.contains("color") &&
                 !value1.equalsIgnoreCase("transparent") && !value2.equalsIgnoreCase("transparent")) {
-                String[] rgb1 = value1.substring(4, value1.length()-1).split(", ");
-                String[] rgb2 = value2.substring(4, value2.length()-1).split(", ");
+                String[] rgb1 = value1.substring(value1.indexOf("(")+1, value1.indexOf(")")).split(", ");
+                String[] rgb2 = value2.substring(value2.indexOf("(")+1, value2.indexOf(")")).split(", ");
                 CIELab lab1 = CIELab.fromXYZ(new RGB(Double.parseDouble(rgb1[0])/255.0,
                         Double.parseDouble(rgb1[1])/255.0,
                         Double.parseDouble(rgb1[2])/255.0).toXYZ(), CIEXYZ.D65);
