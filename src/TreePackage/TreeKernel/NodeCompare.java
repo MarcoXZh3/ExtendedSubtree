@@ -152,7 +152,8 @@ public class NodeCompare{
             if (value1.equalsIgnoreCase(value2))
                 re ++;
         } // for (int i = 0; i < NodeCompare.attributes.length; i++)
-        return (re > 0.7 * NodeCompare.attributes.length) ? 1 : 0;
+        // 0.70 if batch crawling results; 0.75 for case study of w3schools-json
+        return (re > 0.75 * NodeCompare.attributes.length) ? 1 : 0;
         /*String value1 = ((Element)controlNode).getAttribute("info");
         String value2 = ((Element)testNode).getAttribute("info");
 

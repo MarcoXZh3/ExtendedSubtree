@@ -441,22 +441,24 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
         } // for (int j = 0; j < trees.size(); j++)
         */
 
-        String sCL = "D:\\Eclipse_Workspace\\ExtendedSubtree\\CL-BT.xml";
+        String dirPage = "w3schools-json";
+
+        String sCL = "D:\\Eclipse_Workspace\\ExtendedSubtree\\" + dirPage + "\\CL-BT-AD.xml";
         ArrayList<Node> trCL = new ArrayList<Node>();
         Node rtCL = new XMLParser_Java().parse(sCL).getDocumentElement();
         traverseSubtree(rtCL, trCL);
 
-        String sCW = "D:\\Eclipse_Workspace\\ExtendedSubtree\\CW-BT.xml";
+        String sCW = "D:\\Eclipse_Workspace\\ExtendedSubtree\\" + dirPage + "\\CW-BT-AD.xml";
         ArrayList<Node> trCW = new ArrayList<Node>();
         Node rtCW = new XMLParser_Java().parse(sCW).getDocumentElement();
-        traverseSubtree(rtCW, trCW);
 
-        String sFL = "D:\\Eclipse_Workspace\\ExtendedSubtree\\FL-BT.xml";
+        traverseSubtree(rtCW, trCW);
+        String sFL = "D:\\Eclipse_Workspace\\ExtendedSubtree\\" + dirPage + "\\FL-BT-AD.xml";
         ArrayList<Node> trFL = new ArrayList<Node>();
         Node rtFL = new XMLParser_Java().parse(sFL).getDocumentElement();
         traverseSubtree(rtFL, trFL);
 
-        String sFW = "D:\\Eclipse_Workspace\\ExtendedSubtree\\FW-BT.xml";
+        String sFW = "D:\\Eclipse_Workspace\\ExtendedSubtree\\" + dirPage + "\\FW-BT-AD.xml";
         ArrayList<Node> trFW = new ArrayList<Node>();
         Node rtFW = new XMLParser_Java().parse(sFW).getDocumentElement();
         traverseSubtree(rtFW, trFW);
@@ -469,47 +471,7 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
         for (int m = 0; m < trCW.size(); m ++)
             kernal.testNodeList.add(trCW.get(m));
         double est = kernal.getSimilarityNormalized(rtCL, rtCW);
-        System.out.println("CL vs CW: " + est);
-
-        kernal = new TreeKernel_ExtendedSubtree();
-        kernal.controlNodeList = new ArrayList<Node>();
-        for (int m = 0; m < trCL.size(); m ++)
-            kernal.controlNodeList.add(trCL.get(m));
-        kernal.testNodeList = new ArrayList<Node>();
-        for (int m = 0; m < trFL.size(); m ++)
-            kernal.testNodeList.add(trFL.get(m));
-        est = kernal.getSimilarityNormalized(rtCL, rtFL);
-        System.out.println("CL vs FL: " + est);
-
-        kernal = new TreeKernel_ExtendedSubtree();
-        kernal.controlNodeList = new ArrayList<Node>();
-        for (int m = 0; m < trCL.size(); m ++)
-            kernal.controlNodeList.add(trCL.get(m));
-        kernal.testNodeList = new ArrayList<Node>();
-        for (int m = 0; m < trFW.size(); m ++)
-            kernal.testNodeList.add(trFW.get(m));
-        est = kernal.getSimilarityNormalized(rtCL, rtFW);
-        System.out.println("CL vs FW: " + est);
-
-        kernal = new TreeKernel_ExtendedSubtree();
-        kernal.controlNodeList = new ArrayList<Node>();
-        for (int m = 0; m < trCW.size(); m ++)
-            kernal.controlNodeList.add(trCW.get(m));
-        kernal.testNodeList = new ArrayList<Node>();
-        for (int m = 0; m < trFL.size(); m ++)
-            kernal.testNodeList.add(trFL.get(m));
-        est = kernal.getSimilarityNormalized(rtCW, rtFL);
-        System.out.println("CW vs FL: " + est);
-
-        kernal = new TreeKernel_ExtendedSubtree();
-        kernal.controlNodeList = new ArrayList<Node>();
-        for (int m = 0; m < trCW.size(); m ++)
-            kernal.controlNodeList.add(trCW.get(m));
-        kernal.testNodeList = new ArrayList<Node>();
-        for (int m = 0; m < trFW.size(); m ++)
-            kernal.testNodeList.add(trFW.get(m));
-        est = kernal.getSimilarityNormalized(rtCW, rtFW);
-        System.out.println("CW vs FW: " + est);
+        System.out.println("CL vs CW -- AD: " + est);
 
         kernal = new TreeKernel_ExtendedSubtree();
         kernal.controlNodeList = new ArrayList<Node>();
@@ -519,7 +481,127 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
         for (int m = 0; m < trFW.size(); m ++)
             kernal.testNodeList.add(trFW.get(m));
         est = kernal.getSimilarityNormalized(rtFL, rtFW);
-        System.out.println("FL vs FW: " + est);
+        System.out.println("FL vs FW -- AD: " + est);
+
+        kernal = new TreeKernel_ExtendedSubtree();
+        kernal.controlNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trCL.size(); m ++)
+            kernal.controlNodeList.add(trCL.get(m));
+        kernal.testNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trFL.size(); m ++)
+            kernal.testNodeList.add(trFL.get(m));
+        est = kernal.getSimilarityNormalized(rtCL, rtFL);
+        System.out.println("CL vs FL -- AD: " + est);
+
+        /*kernal = new TreeKernel_ExtendedSubtree();
+        kernal.controlNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trCL.size(); m ++)
+            kernal.controlNodeList.add(trCL.get(m));
+        kernal.testNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trFW.size(); m ++)
+            kernal.testNodeList.add(trFW.get(m));
+        est = kernal.getSimilarityNormalized(rtCL, rtFW);
+        System.out.println("CL vs FW -- AD: " + est);
+
+        kernal = new TreeKernel_ExtendedSubtree();
+        kernal.controlNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trCW.size(); m ++)
+            kernal.controlNodeList.add(trCW.get(m));
+        kernal.testNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trFL.size(); m ++)
+            kernal.testNodeList.add(trFL.get(m));
+        est = kernal.getSimilarityNormalized(rtCW, rtFL);
+        System.out.println("CW vs FL -- AD: " + est);*/
+
+        kernal = new TreeKernel_ExtendedSubtree();
+        kernal.controlNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trCW.size(); m ++)
+            kernal.controlNodeList.add(trCW.get(m));
+        kernal.testNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trFW.size(); m ++)
+            kernal.testNodeList.add(trFW.get(m));
+        est = kernal.getSimilarityNormalized(rtCW, rtFW);
+        System.out.println("CW vs FW -- AD: " + est);
+
+        sCL = "D:\\Eclipse_Workspace\\ExtendedSubtree\\" + dirPage + "\\CL-BT-NONAD.xml";
+        trCL = new ArrayList<Node>();
+        rtCL = new XMLParser_Java().parse(sCL).getDocumentElement();
+        traverseSubtree(rtCL, trCL);
+
+        sCW = "D:\\Eclipse_Workspace\\ExtendedSubtree\\" + dirPage + "\\CW-BT-NONAD.xml";
+        trCW = new ArrayList<Node>();
+        rtCW = new XMLParser_Java().parse(sCW).getDocumentElement();
+        traverseSubtree(rtCW, trCW);
+
+        sFL = "D:\\Eclipse_Workspace\\ExtendedSubtree\\" + dirPage + "\\FL-BT-NONAD.xml";
+        trFL = new ArrayList<Node>();
+        rtFL = new XMLParser_Java().parse(sFL).getDocumentElement();
+        traverseSubtree(rtFL, trFL);
+
+        sFW = "D:\\Eclipse_Workspace\\ExtendedSubtree\\" + dirPage + "\\FW-BT-NONAD.xml";
+        trFW = new ArrayList<Node>();
+        rtFW = new XMLParser_Java().parse(sFW).getDocumentElement();
+        traverseSubtree(rtFW, trFW);
+
+        kernal = new TreeKernel_ExtendedSubtree();
+        kernal.controlNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trCL.size(); m ++)
+            kernal.controlNodeList.add(trCL.get(m));
+        kernal.testNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trCW.size(); m ++)
+            kernal.testNodeList.add(trCW.get(m));
+        est = kernal.getSimilarityNormalized(rtCL, rtCW);
+        System.out.println("CL vs CW -- NONAD: " + est);
+
+        kernal = new TreeKernel_ExtendedSubtree();
+        kernal.controlNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trFL.size(); m ++)
+            kernal.controlNodeList.add(trFL.get(m));
+        kernal.testNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trFW.size(); m ++)
+            kernal.testNodeList.add(trFW.get(m));
+        est = kernal.getSimilarityNormalized(rtFL, rtFW);
+        System.out.println("FL vs FW -- NONAD: " + est);
+
+        kernal = new TreeKernel_ExtendedSubtree();
+        kernal.controlNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trCL.size(); m ++)
+            kernal.controlNodeList.add(trCL.get(m));
+        kernal.testNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trFL.size(); m ++)
+            kernal.testNodeList.add(trFL.get(m));
+        est = kernal.getSimilarityNormalized(rtCL, rtFL);
+        System.out.println("CL vs FL -- NONAD: " + est);
+
+        /*kernal = new TreeKernel_ExtendedSubtree();
+        kernal.controlNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trCL.size(); m ++)
+            kernal.controlNodeList.add(trCL.get(m));
+        kernal.testNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trFW.size(); m ++)
+            kernal.testNodeList.add(trFW.get(m));
+        est = kernal.getSimilarityNormalized(rtCL, rtFW);
+        System.out.println("CL vs FW -- NONAD: " + est);
+
+        kernal = new TreeKernel_ExtendedSubtree();
+        kernal.controlNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trCW.size(); m ++)
+            kernal.controlNodeList.add(trCW.get(m));
+        kernal.testNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trFL.size(); m ++)
+            kernal.testNodeList.add(trFL.get(m));
+        est = kernal.getSimilarityNormalized(rtCW, rtFL);
+        System.out.println("CW vs FL -- NONAD: " + est);*/
+
+        kernal = new TreeKernel_ExtendedSubtree();
+        kernal.controlNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trCW.size(); m ++)
+            kernal.controlNodeList.add(trCW.get(m));
+        kernal.testNodeList = new ArrayList<Node>();
+        for (int m = 0; m < trFW.size(); m ++)
+            kernal.testNodeList.add(trFW.get(m));
+        est = kernal.getSimilarityNormalized(rtCW, rtFW);
+        System.out.println("CW vs FW -- NONAD: " + est);
 
     } // public static void runTest(String treeType, int idx1, int idx2) throws Exception
 
@@ -599,6 +681,7 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
 //                runTest("DT", i, j);
 //                runTest("VT", i, j);
                 runTest("BT", i, j);
+                System.exit(0);
             } // for (int j = i+1; j < cases.length; j++)
         } // for (int i = 0; i < cases.length; i++)
 
