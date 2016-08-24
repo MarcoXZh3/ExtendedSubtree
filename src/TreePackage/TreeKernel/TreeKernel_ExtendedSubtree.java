@@ -4,6 +4,8 @@ import MachineLearning.Kernel.AbstractKernelM;
 import TreePackage.TreeTraversal;
 import TreePackage.ParserPackage.XMLParser_Java;
 
+import java.io.File;
+import java.io.FileWriter;
 //import java.io.ByteArrayOutputStream;
 //import java.io.File;
 //import java.io.FileWriter;
@@ -383,16 +385,30 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
         ArrayList<ArrayList<Node>> trees1 = new ArrayList<ArrayList<Node>>();
         ArrayList<String> fileNames1 = new ArrayList<String>();
         for (File f: files1) {
-            if (!f.getName().contains("-" + treeType + ".xml"))
-                continue ;
-            fileNames1.add(f.toString());
-            ArrayList<Node> treeNodes1 = new ArrayList<Node>();
-            Node root = new XMLParser_Java().parse(f.toString()).getDocumentElement();
-            traverseSubtree(root, treeNodes1);
-            trees1.add(treeNodes1);
-            idx ++;
-            if (idx % 100 == 0)
-                System.out.print(idx/100);
+            try {
+                if (!f.getName().contains("-" + treeType + ".xml"))
+                    continue ;
+                fileNames1.add(f.toString());
+                ArrayList<Node> treeNodes1 = new ArrayList<Node>();
+                Node root = new XMLParser_Java().parse(f.toString()).getDocumentElement();
+                traverseSubtree(root, treeNodes1);
+                trees1.add(treeNodes1);
+                idx ++;
+                if (idx % 100 == 0)
+                    System.out.print(idx/100);
+            } catch (Exception e) {
+                String[] paths = {"/home/centos/CL-AD", "/home/centos/CW-AD",
+                                  "/home/centos/FL-AD", "/home/centos/FW-AD",
+                                  "/home/centos/CL-NONAD", "/home/centos/CW-NONAD",
+                                  "/home/centos/FL-NONAD", "/home/centos/FW-NONAD"};
+                String fname = f.getName().split("-" + treeType + "\\.")[0];
+                for (String p: paths) {
+                    new File(p + "/" + fname + "-MR.txt").delete();
+                    new File(p + "/" + fname + "-DT.xml").delete();
+                    new File(p + "/" + fname + "-VT.xml").delete();
+                    new File(p + "/" + fname + "-BT.xml").delete();
+                } // for (String p: paths)
+            } // try - catch (Exception e)
         } // for (File f: files)
         System.out.println();
 
@@ -402,16 +418,30 @@ public class TreeKernel_ExtendedSubtree extends AbstractKernelM{
         ArrayList<ArrayList<Node>> trees2 = new ArrayList<ArrayList<Node>>();
         ArrayList<String> fileNames2 = new ArrayList<String>();
         for (File f: files2) {
-            if (!f.getName().contains("-" + treeType + ".xml"))
-                continue ;
-            fileNames2.add(f.toString());
-            ArrayList<Node> treeNodes2 = new ArrayList<Node>();
-            Node root = new XMLParser_Java().parse(f.toString()).getDocumentElement();
-            traverseSubtree(root, treeNodes2);
-            trees2.add(treeNodes2);
-            idx ++;
-            if (idx % 100 == 0)
-                System.out.print(idx/100);
+            try {
+                if (!f.getName().contains("-" + treeType + ".xml"))
+                    continue ;
+                fileNames2.add(f.toString());
+                ArrayList<Node> treeNodes2 = new ArrayList<Node>();
+                Node root = new XMLParser_Java().parse(f.toString()).getDocumentElement();
+                traverseSubtree(root, treeNodes2);
+                trees2.add(treeNodes2);
+                idx ++;
+                if (idx % 100 == 0)
+                    System.out.print(idx/100);
+            } catch (Exception e) {
+                String[] paths = {"/home/centos/CL-AD", "/home/centos/CW-AD",
+                                  "/home/centos/FL-AD", "/home/centos/FW-AD",
+                                  "/home/centos/CL-NONAD", "/home/centos/CW-NONAD",
+                                  "/home/centos/FL-NONAD", "/home/centos/FW-NONAD"};
+                String fname = f.getName().split("-" + treeType + "\\.")[0];
+                for (String p: paths) {
+                    new File(p + "/" + fname + "-MR.txt").delete();
+                    new File(p + "/" + fname + "-DT.xml").delete();
+                    new File(p + "/" + fname + "-VT.xml").delete();
+                    new File(p + "/" + fname + "-BT.xml").delete();
+                } // for (String p: paths)
+            } // try - catch (Exception e)
         } // for (File f: files)
         System.out.println();
 
